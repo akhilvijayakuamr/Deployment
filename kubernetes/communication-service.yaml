@@ -1,0 +1,115 @@
+# Deployment in communication service
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: communication-service
+  namespace: default
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: communication-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: communication-service
+    spec: 
+      containers:
+      - name: communication-service
+        image: akhil333docker/communication_service
+        imagePullPolicy: Always
+        env:
+          - name: SECRET_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: COMMUNICATION_SECRET_KEY
+
+          - name: DEBUG
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DEBUG
+          
+          - name: POSTGRES_DB
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: COMMUNICATION_DB
+
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_USER
+
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_PASSWORD
+
+          - name: POSTGRES_PORT
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_PORT
+
+          - name: ALLOWED_HOSTS
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: ALLOWED_HOSTS
+
+          - name: RABBITMQ_URL
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: RABBITMQ_URL
+
+          - name: POSTGRES_HOST
+            value: communication-database-service
+        ports:
+          - containerPort: 8002
+        resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+      restartPolicy: Always
+
+---
+
+
+# service in api gateway
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: communication-service
+  namespace: default
+spec:
+  selector: 
+    app: communication-service
+  type: ClusterIP  
+  ports:
+    - name: communication-service
+      port: 8002
+      targetPort: 8002
+
+
+
+
+        
+          
+
+                   

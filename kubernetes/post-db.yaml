@@ -1,0 +1,110 @@
+# post-db deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: post-database
+  template:
+    metadata:
+      labels:
+        app: post-database
+        tier: backend
+    spec:
+      containers:
+        - name: post-database
+          image: postgres:13
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: POST_DB
+
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_PASSWORD
+                
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: post-database-volume-mount
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: post-database-volume-mount
+          persistentVolumeClaim:
+            claimName: post-database-pvc
+      restartPolicy: Always
+
+---
+
+
+# post-db service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: post-database-service
+spec:
+  selector:
+    app: post-database
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+
+
+---
+
+
+# post-db volume
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: post-database-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/post-database-pv
+
+
+---
+
+# post-db volume claim
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: post-database-pvc
+  namespace: default
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  volumeName: post-database-pv
