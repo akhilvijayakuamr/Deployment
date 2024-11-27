@@ -1,0 +1,154 @@
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  
+      - "15672:15672" 
+    networks:
+      - assuretech-network
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+
+  redis:
+    image: redis
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - assuretech-network
+
+
+  api_gateway:
+    image: akhil333docker/api_gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      user-service:
+        condition: service_started
+      post-service:
+        condition: service_started
+      communication-service:
+        condition: service_started
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../Api_gateway/api_gateway/.env
+    networks:
+      - assuretech-network
+
+
+  user_service:
+    image: akhil333docker/user_service
+    container_name: user-service
+    restart: unless-stopped
+    depends_on:
+      user_db:
+        condition: service_started
+    ports:
+      - "50051:50051"
+    env_file:
+      - ../Userservice/user_service/.env
+    networks:
+      - assuretech-network
+
+  
+  post_service:
+    image: akhil333docker/post_service
+    container_name: post-service
+    restart: unless-stopped
+    depends_on:
+      post_db:
+        condition: service_started
+    ports:
+      - "50052:50052"
+    env_file:
+      - ../Postservice/post_service/.env
+    networks:
+      - assuretech-network
+
+
+  communication_service:
+    image: akhil333docker/communication_service
+    container_name: communication-service
+    restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      communication_db:
+        condition: service_started
+    ports:
+      - "8002:8002"
+    env_file:
+      - ../Communication/communication_service/.env
+    networks:
+      - assuretech-network
+
+
+ 
+  user_db:
+    image: postgres:13
+    container_name: user_db
+    restart: unless-stopped
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: ${USER_DB}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - assuretech-network
+
+
+  post_db:
+    image: postgres:13
+    container_name: post_db
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: ${POST_DB}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - post_db_data:/var/lib/postgresql/data
+    networks:
+      - assuretech-network
+      
+
+  communication_db:
+    image: postgres:13
+    container_name: communication_db
+    restart: unless-stopped
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: ${COMMUNICATION_DB}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - communication_db_data:/var/lib/postgresql/data
+    networks:
+      - assuretech-network
+
+networks:
+  assuretech-network:
+    driver: bridge
+
+volumes:
+  api_db_data:
+  user_db_data:
+  post_db_data:
+  communication_db_data:

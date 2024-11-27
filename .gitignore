@@ -1,0 +1,12 @@
+# ignore files
+
+.env
+k8s/secret.yaml
+
+
+
+
+
+
+
+
