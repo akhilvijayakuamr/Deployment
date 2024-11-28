@@ -1,4 +1,4 @@
-# user-db deployment
+# User-db deployment
 
 apiVersion: apps/v1
 kind: Deployment
@@ -46,13 +46,12 @@ spec:
         - name: user-database-volume-mount
           persistentVolumeClaim:
             claimName: user-database-pvc
-      restartPolicy: Always
 
 
 
 ---
 
-# user-db service
+# User-db service
 
 apiVersion: v1
 kind: Service
@@ -68,46 +67,20 @@ spec:
   type: ClusterIP
 
 
----
-
-
-# api-db volume
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: user-database-pv
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 10Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /data/user-database-pv
-
 
 ---
 
 
-# api-db volume claim
-
+# User-db volume claim
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: user-database-pvc
-  namespace: default
-  labels:
-    type: local
 spec:
-  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
-  volumeName: user-database-pv
+      storage: 10Gi
+  storageClassName: do-block-storage

@@ -1,0 +1,87 @@
+# Communication-db deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: communication-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: communication-database
+  template:
+    metadata:
+      labels:
+        app: communication-database
+        tier: backend
+    spec:
+      containers:
+        - name: communication-database
+          image: postgres:13
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: COMMUNICATION_DB
+
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_PASSWORD
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: communication-database-volume-mount
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: communication-database-volume-mount
+          persistentVolumeClaim:
+            claimName: communication-database-pvc
+
+
+
+---
+
+# Communication-db service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: communication-database-service
+spec:
+  selector:
+    app: communication-database
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+
+
+---
+
+
+# Communication-db volume claim
+
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: communication-database-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: do-block-storage
+

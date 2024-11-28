@@ -1,0 +1,155 @@
+# Userservice deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: default
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec: 
+      containers:
+      - name: user-service
+        image: akhil333docker/user_service
+        imagePullPolicy: Always
+        env:
+          - name: SECRET_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: USER_SECRET_KEY
+
+          - name: DEBUG
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DEBUG
+          
+          - name: POSTGRES_DB
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: USER_DB
+
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_USER
+
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_PASSWORD
+
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: AWS_ACCESS_KEY_ID
+
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+
+          - name: AWS_STORAGE_BUCKET_NAME
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: AWS_STORAGE_BUCKET_NAME
+
+          - name: AWS_S3_REGION_NAME
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: AWS_S3_REGION_NAME
+
+          - name: EMAIL_USE_TLS
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: EMAIL_USE_TLS
+
+          - name: EMAIL_HOST_USER
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: EMAIL_HOST_USER
+                
+          - name: EMAIL_HOST_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: EMAIL_HOST_PASSWORD
+
+          - name: EMAIL_DEBUG
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: EMAIL_DEBUG
+
+          - name: POSTGRES_PORT
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_PORT
+
+          - name: ALLOWED_HOSTS
+            value: '*'
+
+          - name: POSTGRES_HOST
+            value: user-database-service
+        ports:
+          - containerPort: 50051
+        resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+      restartPolicy: Always
+
+
+---
+
+
+# Userservice service
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: default
+spec:
+  selector: 
+    app: user-service
+  type: ClusterIP 
+  ports:
+    - name: user-service
+      port: 50051
+      targetPort: 50051
+
+
+
+
+        
+          
+
+                   

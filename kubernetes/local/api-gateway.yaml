@@ -1,4 +1,4 @@
-# Deployment in api gateway
+#api gateway Deployment
 
 apiVersion: apps/v1
 kind: Deployment
@@ -65,7 +65,7 @@ spec:
 ---
 
 
-# service in api gateway
+# api gateway service
 
 
 apiVersion: v1

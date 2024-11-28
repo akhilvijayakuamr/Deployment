@@ -1,4 +1,4 @@
-# redis deployment
+# Redis deployment
 
 apiVersion: apps/v1
 kind: Deployment
@@ -23,7 +23,7 @@ spec:
 
 ---
 
-# redis service
+# Redis service
 
 
 apiVersion: v1

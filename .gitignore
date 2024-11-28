@@ -1,7 +1,8 @@
 # ignore files
 
 .env
-kubernetes/secret.yaml
+kubernetes/local/secret.yaml
+kubernetes/production/secret.yaml
 
 
 

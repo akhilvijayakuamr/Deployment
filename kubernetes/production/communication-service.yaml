@@ -1,4 +1,4 @@
-# Deployment in communication service
+# Communicationservice deployment
 
 apiVersion: apps/v1
 kind: Deployment
@@ -84,12 +84,11 @@ spec:
             limits:
               memory: "1Gi"
               cpu: "1"
-      restartPolicy: Always
 
 ---
 
 
-# service in api gateway
+# Apigateway Service
 
 
 apiVersion: v1

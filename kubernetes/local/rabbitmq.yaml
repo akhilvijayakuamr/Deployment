@@ -1,4 +1,4 @@
-# rabbitmq deployment
+# Rabbitmq deployment
 
 apiVersion: apps/v1
 kind: Deployment
@@ -23,7 +23,7 @@ spec:
 
 ---
 
-# rabbitmq service
+# Rabbitmq service
 
 apiVersion: v1
 kind: Service

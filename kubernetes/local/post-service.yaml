@@ -1,0 +1,135 @@
+#Postservice deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-service
+  namespace: default
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: post-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: post-service
+    spec: 
+      containers:
+      - name: post-service
+        image: akhil333docker/post_service
+        imagePullPolicy: Always
+        env:
+          - name: SECRET_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: POST_SECRET_KEY
+
+          - name: DEBUG
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DEBUG
+          
+          - name: POSTGRES_DB
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: POST_DB
+
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_USER
+
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_PASSWORD
+
+          - name: POSTGRES_PORT
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: DB_PORT
+
+          - name: ALLOWED_HOSTS
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: ALLOWED_HOSTS
+
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: AWS_ACCESS_KEY_ID
+
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+
+          - name: AWS_STORAGE_BUCKET_NAME
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: AWS_STORAGE_BUCKET_NAME
+
+          - name: AWS_S3_REGION_NAME
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: AWS_S3_REGION_NAME
+
+          - name: POSTGRES_HOST
+            value: post-database
+        ports:
+          - containerPort: 50052
+        resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+      restartPolicy: Always
+
+
+---
+
+
+# Postservice service
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: post-service
+  namespace: default
+spec:
+  selector: 
+    app: post-service
+  type: ClusterIP 
+  ports:
+    - name: post-service
+      port: 50052
+      targetPort: 50052
+    
+
+
+
+
+        
+          
+
+                   

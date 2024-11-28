@@ -1,29 +1,29 @@
-# post-db deployment
+# User-db deployment
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: post-database
+  name: user-database
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: post-database
+      app: user-database
   template:
     metadata:
       labels:
-        app: post-database
+        app: user-database
         tier: backend
     spec:
       containers:
-        - name: post-database
+        - name: user-dbdatabase
           image: postgres:13
           env:
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
                   name: all-credentials
-                  key: POST_DB
+                  key: USER_DB
 
             - name: POSTGRES_USER
               valueFrom:
@@ -36,30 +36,31 @@ spec:
                 secretKeyRef:
                   name: all-credentials
                   key: DB_PASSWORD
-                
+
           ports:
             - containerPort: 5432
           volumeMounts:
-            - name: post-database-volume-mount
+            - name: user-database-volume-mount
               mountPath: /var/lib/postgresql/data
       volumes:
-        - name: post-database-volume-mount
+        - name: user-database-volume-mount
           persistentVolumeClaim:
-            claimName: post-database-pvc
+            claimName: user-database-pvc
       restartPolicy: Always
+
+
 
 ---
 
-
-# post-db service
+# User-db service
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: post-database-service
+  name: user-database-service
 spec:
   selector:
-    app: post-database
+    app: user-database
   ports:
     - protocol: TCP
       port: 5432
@@ -70,12 +71,12 @@ spec:
 ---
 
 
-# post-db volume
+# User-db volume
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: post-database-pv
+  name: user-database-pv
   labels:
     type: local
 spec:
@@ -86,17 +87,19 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /data/post-database-pv
+    path: /data/user-database-pv
 
 
 ---
 
-# post-db volume claim
+
+# User-db volume claim
+
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: post-database-pvc
+  name: user-database-pvc
   namespace: default
   labels:
     type: local
@@ -107,4 +110,4 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  volumeName: post-database-pv
+  volumeName: user-database-pv

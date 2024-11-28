@@ -1,29 +1,29 @@
-# communication-db deployment
+# Post-db deployment
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: communication-database
+  name: post-database
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: communication-database
+      app: post-database
   template:
     metadata:
       labels:
-        app: communication-database
+        app: post-database
         tier: backend
     spec:
       containers:
-        - name: communication-database
+        - name: post-database
           image: postgres:13
           env:
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
                   name: all-credentials
-                  key: COMMUNICATION_DB
+                  key: POST_DB
 
             - name: POSTGRES_USER
               valueFrom:
@@ -36,30 +36,29 @@ spec:
                 secretKeyRef:
                   name: all-credentials
                   key: DB_PASSWORD
+                
           ports:
             - containerPort: 5432
           volumeMounts:
-            - name: communication-database-volume-mount
+            - name: post-database-volume-mount
               mountPath: /var/lib/postgresql/data
       volumes:
-        - name: communication-database-volume-mount
+        - name: post-database-volume-mount
           persistentVolumeClaim:
-            claimName: communication-database-pvc
-      restartPolicy: Always
-
-
+            claimName: post-database-pvc
 
 ---
 
-# api-db service
+
+# Post-db service
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: communication-database-service
+  name: post-database-service
 spec:
   selector:
-    app: communication-database
+    app: post-database
   ports:
     - protocol: TCP
       port: 5432
@@ -67,45 +66,20 @@ spec:
   type: ClusterIP
 
 
----
-
-
-# api-db volume
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: communication-database-pv
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 10Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /data/communication-database-pv
-
 
 ---
 
+# Post-db volume claim
 
-# api-db volume claim
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: communication-database-pvc
-  namespace: default
-  labels:
-    type: local
+  name: post-database-pvc
 spec:
-  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
-  volumeName: communication-database-pv
+      storage: 10Gi
+  storageClassName: do-block-storage

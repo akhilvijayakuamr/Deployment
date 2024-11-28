@@ -1,4 +1,4 @@
-# Deployment in user service
+# Userervice deployment
 
 apiVersion: apps/v1
 kind: Deployment
@@ -123,13 +123,12 @@ spec:
             limits:
               memory: "1Gi"
               cpu: "1"
-      restartPolicy: Always
 
 
 ---
 
 
-# service in user service
+# Userservice service
 
 
 apiVersion: v1
