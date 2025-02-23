@@ -34,11 +34,11 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      user-service:
+      user_service:
         condition: service_started
-      post-service:
+      post_service:
         condition: service_started
-      communication-service:
+      communication_service:
         condition: service_started
     ports:
       - "8000:8000"

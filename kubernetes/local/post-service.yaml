@@ -92,7 +92,7 @@ spec:
                   key: AWS_S3_REGION_NAME
 
           - name: POSTGRES_HOST
-            value: post-database
+            value: post-database-service
         ports:
           - containerPort: 50052
         resources:

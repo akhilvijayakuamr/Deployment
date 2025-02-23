@@ -55,6 +55,24 @@ spec:
                   name: all-credentials
                   key: POST_SERVICE_URL
 
+          - name: STRIP_SECRET_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: STRIP_SECRET_KEY
+
+          - name: WEB_HOOKS_SECRET_KEY
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: WEB_HOOKS_SECRET_KEY
+
+          - name: FRONT_END_URL
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: FRONT_END_URL
+
           - name: ALLOWED_HOSTS
             value: '*'
         ports:

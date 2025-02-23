@@ -1,4 +1,4 @@
-# Userservice deployment
+# Userervice deployment
 
 apiVersion: apps/v1
 kind: Deployment
@@ -123,7 +123,6 @@ spec:
             limits:
               memory: "1Gi"
               cpu: "1"
-      restartPolicy: Always
 
 
 ---
@@ -146,10 +145,3 @@ spec:
       port: 50051
       targetPort: 50051
 
-
-
-
-        
-          
-
-                   

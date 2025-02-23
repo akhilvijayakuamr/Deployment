@@ -73,6 +73,30 @@ spec:
                   name: all-credentials
                   key: RABBITMQ_URL
 
+          - name: EMAIL_USE_TLS
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: EMAIL_USE_TLS
+
+          - name: EMAIL_HOST_USER
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: EMAIL_HOST_USER
+                
+          - name: EMAIL_HOST_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: EMAIL_HOST_PASSWORD
+
+          - name: EMAIL_DEBUG
+            valueFrom:
+                secretKeyRef:
+                  name: all-credentials
+                  key: EMAIL_DEBUG
+
           - name: POSTGRES_HOST
             value: communication-database-service
         ports:

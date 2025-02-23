@@ -38,9 +38,12 @@ spec:
                   key: DB_PASSWORD
           ports:
             - containerPort: 5432
+
           volumeMounts:
             - name: communication-database-volume-mount
               mountPath: /var/lib/postgresql/data
+              
+              
       volumes:
         - name: communication-database-volume-mount
           persistentVolumeClaim:
